@@ -1,0 +1,32 @@
+{% set transformSets = settings.transformSets %}
+{% set primaryFormat = settings.primaryFormat %}
+{% set fallbackFormat = settings.fallbackFormat %}
+
+<picture>
+  {% for image in images %}
+    <source
+      type="image/{{ primaryFormat }}"
+      srcset=
+        "{% for transform in transformSets[image[1]] %}
+          {{ image[0].getUrl(transform|merge({format: primaryFormat})) }} {{ transform.width }}w,
+        {% endfor %}"
+      {% if loop.index > 1 %}
+        media="(min-width: {{ image[2]|default(0) }}px)"
+      {% endif %}
+    />
+  {% endfor %}
+  {# default to largest image #}
+  {% set image = images|last %}
+  <img
+    {{ attr(attributes) }}
+    {# default to first transform #}
+    {% set firstTransform = transformSets[image[1]][0] %}
+    src="{{ image[0].getUrl(firstTransform|merge({format: fallbackFormat})) }}"
+    srcset=
+      "{% for transform in transformSets[image[1]] %}
+        {{ image[0].getUrl(transform|merge({format: fallbackFormat})) }} {{ transform.width }}w,
+      {% endfor %}"
+    alt="{{ image[0].alt ?? image[0].title }}"
+    {% if eager != true %}loading="lazy"{% endif %}
+  />
+</picture>

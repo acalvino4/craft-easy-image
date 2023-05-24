@@ -19,15 +19,15 @@
   },
   "autoload": {
     "psr-4": {
-      "acalvino4\\crafteasyimage\\": "src/"
+      "acalvino4\\easyimage\\": "src/"
     }
   },
   "extra": {
     "handle": "easy-image",
     "name": "Easy Image",
-    "developer": "Augustine Calvino",
+    "developer": "acalvino4",
     "documentationUrl": "https://github.com/acalvino4/craft-easy-image",
-    "class": "acalvino4\\crafteasyimage\\EasyImage"
+    "class": "acalvino4\\easyimage\\Plugin"
   },
   "scripts": {
     "test": "ecs check --ansi && phpstan --memory-limit=1G",
