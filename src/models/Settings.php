@@ -2,24 +2,38 @@
 
 namespace acalvino4\easyimage\models;
 
-use craft\config\BaseConfig;
-use craft\models\ImageTransform;
-
 /**
  * Easy Image settings
  *
  * @phpstan-type FormatOption 'jpg'|'png'|'gif'|'webp'|'avif'
  */
-class Settings extends BaseConfig
+class Settings extends TransformSet
 {
-    /** @var array<string, array<ImageTransform>> */
+    /** @var array<TransformSet> */
     public array $transformSets = [];
 
-    /** @var FormatOption */
-    public string $primaryFormat = 'avif';
+    /**
+     * @inheritdoc
+     *
+     * @param mixed $config
+     */
+    public function __construct(...$config)
+    {
+        if (array_key_exists('transforms', $config)) {
+            throw new \InvalidArgumentException("Cannot specify 'transforms' on Easy Image settings. Did you mean 'transformSet'?");
+        }
 
-    /** @var FormatOption */
-    public string $fallbackFormat = 'webp';
+        if (!array_key_exists('format', $config)) {
+            $config['format'] = 'avif';
+        }
+        if (!array_key_exists('falbackFormat', $config)) {
+            $config['fallbackFormat'] = 'webp';
+        }
+
+        parent::__construct(...$config);
+    }
+
+
 
     /**
      * Image transforms are often used in sets via the picture tag for responsive image loading.
@@ -27,7 +41,7 @@ class Settings extends BaseConfig
      * The value is a list of the Image Transforms to be generated for the set.
      * Typically you'll only need to set width and height, but all settings (https://craftcms.com/docs/4.x/image-transforms.html#defining-transforms-from-the-control-panel) are supported, other than format, which is determined by top level settings.
      *
-     * @param array<string, array<ImageTransform>> $transformSets The array of ImageTransform sets.
+     * @param array<TransformSet> $transformSets The array of TransformSet.
      * @return self
      */
     public function transformSets(array $transformSets): self
@@ -39,12 +53,12 @@ class Settings extends BaseConfig
     /**
      * Sets the primary format to which images should be transformed. Defaults to avif.
      *
-     * @param FormatOption $primaryFormat
+     * @param FormatOption $format
      * @return self
      */
-    public function primaryFormat(string $primaryFormat): self
+    public function format(string $format): self
     {
-        $this->primaryFormat = $primaryFormat;
+        $this->format = $format;
         return $this;
     }
 

@@ -1,32 +1,45 @@
-{% set transformSets = settings.transformSets %}
-{% set primaryFormat = settings.primaryFormat %}
-{% set fallbackFormat = settings.fallbackFormat %}
+{% macro srcset(image, transformSet) %}
+  srcset=
+    "{% for transform in transformSet.transforms %}
+      {% set mergedTransform = transformSet|merge(transform)|prepareTransform %}
+      {{ image[0].getUrl(mergedTransform) }} {{ mergedTransform.width }}w,
+    {% endfor %}"
+{% endmacro %}
 
+{% set transformSets = settings.transformSets %}
 <picture>
+  {# Output sources for main format #}
   {% for image in images %}
-    <source
-      type="image/{{ primaryFormat }}"
-      srcset=
-        "{% for transform in transformSets[image[1]] %}
-          {{ image[0].getUrl(transform|merge({format: primaryFormat})) }} {{ transform.width }}w,
-        {% endfor %}"
-      {% if loop.index > 1 %}
-        media="(min-width: {{ image[2]|default(0) }}px)"
-      {% endif %}
-    />
+    {% set transformSet = settings|merge(transformSets[image[1]]) %}
+    {% if transformSet.format is not same as(transformSet.fallbackFormat) %} {# if these are identical, the source will be covered in the next images loop #}
+      <source
+        type="image/{{ transformSet.format }}"
+        {{ _self.srcset(image, transformSet) }}
+        {% if not loop.last %}
+          media="(min-width: {{ image[2]|default(0) }}px)"
+        {% endif %}
+      />
+    {% endif %}
   {% endfor %}
-  {# default to largest image #}
-  {% set image = images|last %}
-  <img
-    {{ attr(attributes) }}
-    {# default to first transform #}
-    {% set firstTransform = transformSets[image[1]][0] %}
-    src="{{ image[0].getUrl(firstTransform|merge({format: fallbackFormat})) }}"
-    srcset=
-      "{% for transform in transformSets[image[1]] %}
-        {{ image[0].getUrl(transform|merge({format: fallbackFormat})) }} {{ transform.width }}w,
-      {% endfor %}"
-    alt="{{ image[0].alt ?? image[0].title }}"
-    {% if eager != true %}loading="lazy"{% endif %}
-  />
+  {# Output sources for fallback format #}
+  {% for image in images %}
+    {% set transformSet = settings|merge(transformSets[image[1]]) %}
+    {% set transformSet = transformSet|merge({format: transformSet.fallbackFormat}) %}
+    {% if not loop.last %}
+      <source
+        type="image/{{ transformSet.format }}"
+        {{ _self.srcset(image, transformSet) }}
+        media="(min-width: {{ image[2]|default(0) }}px)"
+      />
+    {% else %} {# Fallback img tag in place of final source #}
+      <img
+        {{ attr(attributes) }}
+        {# default to first transform for required src attr #}
+        src="{{ image[0].getUrl(transformSet|merge(transformSet.transforms[0])|prepareTransform) }}"
+        {{ _self.srcset(image, transformSet) }}
+        alt="{{ image[0].alt ?? image[0].title }}"
+        {% if eager != true %}loading="lazy"{% endif %}
+      />
+    {% endif %}
+  {% endfor %}
 </picture>
