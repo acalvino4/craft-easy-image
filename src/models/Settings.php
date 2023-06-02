@@ -2,6 +2,8 @@
 
 namespace acalvino4\easyimage\models;
 
+use craft\helpers\ImageTransforms as IT;
+
 /**
  * Easy Image settings
  *
@@ -9,7 +11,7 @@ namespace acalvino4\easyimage\models;
  */
 class Settings extends TransformSet
 {
-    /** @var array<TransformSet> */
+    /** @var TransformSet[] */
     public array $transformSets = [];
 
     /**
@@ -33,6 +35,44 @@ class Settings extends TransformSet
         parent::__construct(...$config);
     }
 
+    /**
+     * Normalizes settings to a format where they can easily be consumed by twig template.
+     * This involves cascading settings down to transforms and transform sets,
+     * and calculating height and width from aspect ratio if either was left blank.
+     */
+    public function normalize(): void
+    {
+        $settingsArr = array_filter($this->toArray());
+        foreach ($this->transformSets as &$transformSet) {
+            if (!$transformSet->format) {
+                $transformSet->format = $this->format;
+            }
+            if (!$transformSet->fallbackFormat) {
+                $transformSet->fallbackFormat = $this->fallbackFormat;
+            }
+
+            $transformSetArr = array_filter($transformSet->toArray());
+            $newTransforms = [];
+            foreach ($transformSet->transforms as $transform) {
+                /** @var Transform */
+                $newTransform = IT::extendTransform(IT::extendTransform($transform, $transformSetArr), $settingsArr);
+
+                $aspectRatio = $transform->aspectRatio ?? $transformSet->aspectRatio ?? $this->aspectRatio;
+                if ($aspectRatio) {
+                    if (!$newTransform->height) {
+                        $newTransform->height = (int) round($newTransform->width / $aspectRatio);
+                    }
+                    if (!$newTransform->width) {
+                        $newTransform->width = (int) round($newTransform->height * $aspectRatio);
+                    }
+                    $newTransform->aspectRatio = $aspectRatio;
+                }
+                $newTransforms[] = $newTransform;
+            }
+            $transformSet->transforms = $newTransforms;
+        }
+    }
+
 
 
     /**
@@ -41,7 +81,7 @@ class Settings extends TransformSet
      * The value is a list of the Image Transforms to be generated for the set.
      * Typically you'll only need to set width and height, but all settings (https://craftcms.com/docs/4.x/image-transforms.html#defining-transforms-from-the-control-panel) are supported, other than format, which is determined by top level settings.
      *
-     * @param array<TransformSet> $transformSets The array of TransformSet.
+     * @param TransformSet[] $transformSets The array of TransformSet.
      * @return self
      */
     public function transformSets(array $transformSets): self
@@ -63,7 +103,7 @@ class Settings extends TransformSet
     }
 
     /**
-     * Sets the fallback format to which images should be transformed. Defaults to avif.
+     * Sets the fallback format to which images should be transformed. Defaults to webp.
      *
      * @param FormatOption $fallbackFormat
      * @return self
