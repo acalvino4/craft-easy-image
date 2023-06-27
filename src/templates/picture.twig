@@ -1,8 +1,13 @@
 {% macro srcset(image, transformSet) %}
-  srcset=
-    "{% for transform in transformSet.transforms %}
+  srcset="
+    {% for transform in transformSet.transforms %}
       {{ image[0].getUrl(transform) }} {{ transform.width }}w,
-    {% endfor %}"
+    {% endfor %}
+  "
+  {# Set height and width based on the set's aspect ratio;
+     these numbers are just used to calculate aspect ratio to prevent CLS. #}
+  height="144"
+  width="{{ (144 * transformSet.aspectRatio)|round }}"
 {% endmacro %}
 
 <picture>
@@ -11,7 +16,7 @@
     {% set transformSet = settings.transformSets[image[1]] %}
     {% if transformSet.format is not same as(transformSet.fallbackFormat) %} {# if these are identical, the source will be covered in the next images loop #}
       <source
-        type="image/{{ transformSet.format }}"
+        type="image/{{ transformSet.format == 'jpg' ? 'jpeg' : transformSet.format }}"
         {{ _self.srcset(image, transformSet) }}
         {% if not loop.last %}
           media="(min-width: {{ image[2]|default(0) }}px)"

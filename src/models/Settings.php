@@ -2,8 +2,6 @@
 
 namespace acalvino4\easyimage\models;
 
-use craft\helpers\ImageTransforms as IT;
-
 /**
  * Easy Image settings
  *
@@ -33,6 +31,7 @@ class Settings extends TransformSet
         }
 
         parent::__construct(...$config);
+
     }
 
     /**
@@ -44,32 +43,28 @@ class Settings extends TransformSet
     {
         $settingsArr = array_filter($this->toArray());
         foreach ($this->transformSets as &$transformSet) {
-            if (!$transformSet->format) {
-                $transformSet->format = $this->format;
-            }
-            if (!$transformSet->fallbackFormat) {
-                $transformSet->fallbackFormat = $this->fallbackFormat;
-            }
-
+            $transformSet->extend($settingsArr);
             $transformSetArr = array_filter($transformSet->toArray());
+
             $newTransforms = [];
             foreach ($transformSet->transforms as $transform) {
-                /** @var Transform */
-                $newTransform = IT::extendTransform(IT::extendTransform($transform, $transformSetArr), $settingsArr);
+                $transform->extend($transformSetArr);
 
-                $aspectRatio = $transform->aspectRatio ?? $transformSet->aspectRatio ?? $this->aspectRatio;
-                if ($aspectRatio) {
-                    if (!$newTransform->height) {
-                        $newTransform->height = (int) round($newTransform->width / $aspectRatio);
+                if ($transform->aspectRatio) {
+                    if (!$transform->height) {
+                        $transform->height = (int) round($transform->width / $transform->aspectRatio);
                     }
-                    if (!$newTransform->width) {
-                        $newTransform->width = (int) round($newTransform->height * $aspectRatio);
+                    if (!$transform->width) {
+                        $transform->width = (int) round($transform->height * $transform->aspectRatio);
                     }
-                    $newTransform->aspectRatio = $aspectRatio;
                 }
-                $newTransforms[] = $newTransform;
+                $newTransforms[] = $transform;
             }
             $transformSet->transforms = $newTransforms;
+
+            // Set the set's aspect ratio if not specified based on first transform in set
+            if (!$transformSet->aspectRatio && $transformSet->transforms)
+                $transformSet->aspectRatio = $transformSet->transforms[0]->height / $transformSet->transforms[0]->width;
         }
     }
 

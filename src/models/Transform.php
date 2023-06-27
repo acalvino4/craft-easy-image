@@ -24,7 +24,7 @@ class Transform extends ImageTransform
      */
     public function __construct(...$config)
     {
-        if (get_class($this) === self::class && $config['format']) {
+        if (get_class($this) === self::class && array_key_exists('format', $config)) {
             throw new \InvalidArgumentException("Cannot specify 'format' on individual Easy Image transforms. Try specifying on a transform set or globally.");
         }
 
@@ -41,5 +41,32 @@ class Transform extends ImageTransform
         $rules[] = [['aspectRatio'], 'number'];
 
         return $rules;
+    }
+
+    /**
+     * Extend this transform by overriding its parameters if not set already.
+     *
+     * @param mixed[] $parameters
+     */
+    public function extend(array $parameters): void
+    {
+        $whiteList = [
+            'width',
+            'height',
+            'format',
+            'mode',
+            'format',
+            'position',
+            'quality',
+            'interlace',
+            'transformer',
+            'aspectRatio',
+        ];
+
+        foreach ($parameters as $parameter => $value) {
+            if (in_array($parameter, $whiteList, true) && empty($this->$parameter)) {
+                $this->$parameter = $value;
+            }
+        }
     }
 }

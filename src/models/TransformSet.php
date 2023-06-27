@@ -52,4 +52,32 @@ class TransformSet extends Transform
 
         return $rules;
     }
+
+    /**
+     * @inheritDoc
+     *
+     * @param mixed[] $parameters
+     */
+    public function extend(array $parameters): void
+    {
+        $whiteList = [
+            'width',
+            'height',
+            'format',
+            'mode',
+            'format',
+            'fallbackFormat',
+            'position',
+            'quality',
+            'interlace',
+            'transformer',
+            'aspectRatio',
+        ];
+
+        foreach ($parameters as $parameter => $value) {
+            if (in_array($parameter, $whiteList, true) && empty($this->$parameter)) {
+                $this->$parameter = $value;
+            }
+        }
+    }
 }

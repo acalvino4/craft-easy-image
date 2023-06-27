@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+## Description: Run tests
+## Usage: test
+## Example: ddev test
+
+ddev npm run test
+ddev composer run-script test

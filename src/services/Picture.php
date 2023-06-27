@@ -11,7 +11,7 @@ use yii\base\Component;
 /**
  * Easy Image service
  *
- * @phpstan-type ImageData array{Asset, string, 2?: int}
+ * @phpstan-type ImageData array{?Asset, string, 2?: int}
  */
 class Picture extends Component
 {
@@ -24,15 +24,17 @@ class Picture extends Component
      * @param Settings $settings
      * @return string
      */
-    public function getPictureHTML(array $images, $attributes, $eager, Settings $settings): string
+    public function getPictureHtml(array $images, $attributes, $eager, Settings $settings): string
     {
+        // echo 'format: ' . $settings->transformSets['hero']->transforms[0]->format . ";\n";
+        // die;
         // if single image details passed, rather than array, make it an array of one
         /** @var ImageData[] */
         $images = is_array($images[0]) ? $images : [$images];
 
         // svg files shouldn't be transformed, as they are almost always more optimized than raster formats
         // TODO: have this handle multiple images, of which any might be svg
-        if ($images[0][0]->extension === '.svg') {
+        if ($images[0][0]?->extension === '.svg') {
             return Html::svg($images[0][0]);
         }
 

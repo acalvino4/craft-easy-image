@@ -1,0 +1,25 @@
+actor: Tester
+paths:
+  tests: tests
+  output: tests/_output
+  data: tests/Support/Data
+  support: tests/Support
+  envs: tests/_envs
+namespace: Tests
+support_namespace: Support
+bootstrap: _bootstrap.php
+params:
+  - tests/.env
+modules:
+  config:
+    \craft\test\Craft:
+      configFile: "tests/_craft/config/test.php"
+      entryUrl: "https://easyimage.local/index.php"
+      projectConfig: {}
+      migrations: []
+      plugins:
+        - class: '\acalvino4\easyimage\Plugin'
+          handle: easy-image
+      cleanup: true
+      transaction: true
+      dbSetup: { clean: true, setupCraft: true }

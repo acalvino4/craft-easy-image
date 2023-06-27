@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+## Description: Start ddev containers with vite dev server
+## Usage: dev
+## Example: ddev dev
+
+ddev npm run dev

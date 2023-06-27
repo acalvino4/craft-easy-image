@@ -32,6 +32,6 @@ class Extension extends AbstractExtension
     public function picture(array $images, $attributes = [], $eager = false): string
     {
         $plugin = Plugin::getInstance();
-        return $plugin->picture->getPictureHTML($images, $attributes, $eager, $plugin->getSettings());
+        return $plugin->picture->getPictureHtml($images, $attributes, $eager, $plugin->getSettings());
     }
 }
