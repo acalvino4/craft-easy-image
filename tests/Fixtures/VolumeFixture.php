@@ -4,9 +4,6 @@ namespace Tests\Fixtures;
 
 use craft\records\Volume;
 use craft\test\ActiveFixture;
-use Craft;
-use craft\services\Volumes;
-
 
 class VolumeFixture extends ActiveFixture
 {

@@ -2,33 +2,47 @@
 
 namespace acalvino4\easyimage\models;
 
+use craft\models\ImageTransform;
+
 /**
  * Image Transform extension
  *
  * @phpstan-type FormatOption 'jpg'|'png'|'gif'|'webp'|'avif'
  */
-class TransformSet extends Transform
+class TransformSet extends ImageTransform
 {
+    /** @var float an aspect ratio from which to calculate width or height if exactly one is missing */
+    public ?float $aspectRatio = null;
+
     /** @var FormatOption */
     public ?string $fallbackFormat = null;
 
-    /** @var Transform[] */
+    /** @var ImageTransform[] */
     public array $transforms = [];
 
+    /** @var int[] */
+    public array $widths = [];
+
+    /** @var string[] */
+    public const ALLOWED_CASCADES = [
+        'mode',
+        'format',
+        'fallbackFormat',
+        'position',
+        'quality',
+        'interlace',
+        'transformer',
+    ];
+
+
     /**
-     * Updates the $format property of this object and all child transforms to $fallbackFormat
+     * @inheritDoc
      *
-     * @return void
+     * @param mixed ...$config
      */
-    public function fallback(): void
+    public function __construct(...$config)
     {
-        if ($this->format === $this->fallbackFormat) {
-            return;
-        }
-        foreach ($this->transforms as &$transform) {
-            $transform->format = $this->fallbackFormat;
-        }
-        $this->format = $this->fallbackFormat;
+        parent::__construct($config);
     }
 
     /**
@@ -49,8 +63,25 @@ class TransformSet extends Transform
                 'avif',
             ],
         ];
+        $rules[] = [['aspectRatio'], 'number'];
 
         return $rules;
+    }
+
+    /**
+     * Updates the $format property of this object and all child transforms to $fallbackFormat
+     *
+     * @return void
+     */
+    public function fallback(): void
+    {
+        if ($this->format === $this->fallbackFormat) {
+            return;
+        }
+        foreach ($this->transforms as &$transform) {
+            $transform->format = $this->fallbackFormat;
+        }
+        $this->format = $this->fallbackFormat;
     }
 
     /**
@@ -60,22 +91,8 @@ class TransformSet extends Transform
      */
     public function extend(array $parameters): void
     {
-        $whiteList = [
-            'width',
-            'height',
-            'format',
-            'mode',
-            'format',
-            'fallbackFormat',
-            'position',
-            'quality',
-            'interlace',
-            'transformer',
-            'aspectRatio',
-        ];
-
         foreach ($parameters as $parameter => $value) {
-            if (in_array($parameter, $whiteList, true) && empty($this->$parameter)) {
+            if (in_array($parameter, static::ALLOWED_CASCADES, true) && !empty($value) && empty($this->$parameter)) {
                 $this->$parameter = $value;
             }
         }

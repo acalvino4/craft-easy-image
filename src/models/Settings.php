@@ -2,6 +2,8 @@
 
 namespace acalvino4\easyimage\models;
 
+use craft\helpers\ImageTransforms;
+
 /**
  * Easy Image settings
  *
@@ -19,8 +21,9 @@ class Settings extends TransformSet
      */
     public function __construct(...$config)
     {
-        if (array_key_exists('transforms', $config)) {
-            throw new \InvalidArgumentException("Cannot specify 'transforms' on Easy Image settings. Did you mean 'transformSet'?");
+        $disallowedOptions = implode(', ', array_diff(array_keys($config), array_merge(static::ALLOWED_CASCADES, ['transformSets'])));
+        if ($disallowedOptions) {
+            throw new \InvalidArgumentException("Cannot specify the following on Easy Image top-level settings: $disallowedOptions");
         }
 
         if (!array_key_exists('format', $config)) {
@@ -31,7 +34,6 @@ class Settings extends TransformSet
         }
 
         parent::__construct(...$config);
-
     }
 
     /**
@@ -44,31 +46,20 @@ class Settings extends TransformSet
         $settingsArr = array_filter($this->toArray());
         foreach ($this->transformSets as &$transformSet) {
             $transformSet->extend($settingsArr);
-            $transformSetArr = array_filter($transformSet->toArray());
 
-            $newTransforms = [];
-            foreach ($transformSet->transforms as $transform) {
-                $transform->extend($transformSetArr);
-
-                if ($transform->aspectRatio) {
-                    if (!$transform->height) {
-                        $transform->height = (int) round($transform->width / $transform->aspectRatio);
-                    }
-                    if (!$transform->width) {
-                        $transform->width = (int) round($transform->height * $transform->aspectRatio);
-                    }
+            $transforms = [];
+            foreach ($transformSet->widths as $width) {
+                if ($transformSet->aspectRatio) {
+                    $height = (int) round($width / $transformSet->aspectRatio);
                 }
-                $newTransforms[] = $transform;
+                $transforms[] = ImageTransforms::extendTransform($transformSet, [
+                    'width' => $width,
+                    'height' => $height ?? 0,
+                ]);
             }
-            $transformSet->transforms = $newTransforms;
-
-            // Set the set's aspect ratio if not specified based on first transform in set
-            if (!$transformSet->aspectRatio && $transformSet->transforms)
-                $transformSet->aspectRatio = $transformSet->transforms[0]->height / $transformSet->transforms[0]->width;
+            $transformSet->transforms = $transforms;
         }
     }
-
-
 
     /**
      * Image transforms are often used in sets via the picture tag for responsive image loading.

@@ -2,9 +2,8 @@
 
 namespace Tests\Fixtures;
 
-use Craft;
-use Tests\Facades\Asset;
 use craft\base\ElementInterface;
+use Tests\Facades\Asset;
 
 class AssetFixture extends \craft\test\fixtures\elements\AssetFixture
 {

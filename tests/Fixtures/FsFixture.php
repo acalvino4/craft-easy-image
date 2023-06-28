@@ -3,9 +3,8 @@
 namespace Tests\Fixtures;
 
 use Craft;
-use yii\test\ArrayFixture;
 use craft\base\FsInterface;
-
+use yii\test\ArrayFixture;
 
 class FsFixture extends ArrayFixture
 {
@@ -35,9 +34,9 @@ class FsFixture extends ArrayFixture
 
         $fsService = Craft::$app->fs;
 
-        foreach($this->data as $handle => $fsConfig) {
+        foreach ($this->data as $handle => $fsConfig) {
             $oldFs = $fsService->getFilesystemByHandle($handle);
-            if($oldFs) {
+            if ($oldFs) {
                 $oldFilesystems[] = $oldFs;
                 $fsService->removeFilesystem($oldFs);
             }
@@ -56,10 +55,10 @@ class FsFixture extends ArrayFixture
     {
         $fsService = Craft::$app->fs;
 
-        foreach($this->newFilesystems as $fs) {
+        foreach ($this->newFilesystems as $fs) {
             $fsService->removeFilesystem($fs);
         }
-        foreach($this->oldFilesystems as $fs) {
+        foreach ($this->oldFilesystems as $fs) {
             $fsService->saveFilesystem($fs);
         }
 

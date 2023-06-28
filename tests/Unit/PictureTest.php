@@ -2,15 +2,13 @@
 
 namespace Tests\Unit;
 
-use Codeception\Test\Unit;
-use Tests\Support\UnitTester;
-use Tests\Fixtures\AssetFixture;
-use Tests\Facades\Asset;
-use acalvino4\easyimage\models\Settings;
 use acalvino4\easyimage\Plugin;
-use acalvino4\easyimage\services\Picture;
-use Tests\Support\Helper\Unit as UnitHelper;
 use Codeception\Attribute\DataProvider;
+use Codeception\Test\Unit;
+use Tests\Facades\Asset;
+use Tests\Fixtures\AssetFixture;
+use Tests\Support\Helper\Unit as UnitHelper;
+use Tests\Support\UnitTester;
 
 class PictureTest extends Unit
 {
@@ -37,10 +35,12 @@ class PictureTest extends Unit
     {
         # Fetch images
         if (is_array($images[0])) {
-            foreach($images as &$image)
+            foreach ($images as &$image) {
                 $image[0] = Asset::find()->filename($image[0])->one();
-        } else
+            }
+        } else {
             $images[0] = Asset::find()->filename($images[0])->one();
+        }
 
         # Apply setting overrides
         $settings = Plugin::getInstance()->getSettings();

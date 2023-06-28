@@ -33,5 +33,4 @@ class FolderFixture extends ActiveFixture
 
         Craft::$app->set('volumes', new Volumes());
     }
-
 }

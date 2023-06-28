@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Support\Helper;
 
-use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Constraint\IsEqual;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I

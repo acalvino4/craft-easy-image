@@ -22,7 +22,7 @@ $assets = [
     ],
 ];
 
-return array_map(function ($asset) {
+return array_map(function($asset) {
     return array_merge($asset, [
         'tempFilePath' => dirname(__FILE__, 3) . "/_craft/storage/runtime/temp/" . $asset['filename'],
         'volumeId' => 1000,

@@ -2,10 +2,10 @@
 
 namespace Tests\Facades;
 
-use craft\models\ImageTransform;
-use craft\helpers\ImageTransforms;
 use craft\elements\Asset as BaseAsset;
+use craft\helpers\ImageTransforms;
 use craft\imagetransforms\ImageTransformer;
+use craft\models\ImageTransform;
 
 class Asset extends BaseAsset
 {
@@ -26,6 +26,5 @@ class Asset extends BaseAsset
             die;
         }
         return $rootUrl . $basePath . '/' . $transformString . '/' . $filename;
-
     }
 }
