@@ -2,47 +2,117 @@
 
 namespace acalvino4\easyimage\models;
 
+use craft\base\imagetransforms\ImageTransformerInterface;
+use craft\base\Model;
 use craft\models\ImageTransform;
 
 /**
  * Image Transform extension
  *
- * @phpstan-type FormatOption 'jpg'|'png'|'gif'|'webp'|'avif'
+ * @phpstan-type Format 'jpg'|'png'|'gif'|'webp'|'avif'
+ * @phpstan-type Mode 'crop'|'fit'|'stretch'|'letterbox'
+ * @phpstan-type Position 'top-left'|'top-center'|'top-right'|'center-left'|'center-center'|'center-right'|'bottom-left'|'bottom-center'|'bottom-right'
+ * @phpstan-type Interlace 'none'|'line'|'plane'|'partition'
+ * @property ?Format $format
  */
-class TransformSet extends ImageTransform
+class TransformSet extends Model
 {
-    /** @var float an aspect ratio from which to calculate width or height if exactly one is missing */
-    public ?float $aspectRatio = null;
+    /** @var ?Format */
+    public ?string $format = null;
 
-    /** @var FormatOption */
+    /** @var ?Format The fallback format for when the browser doesn't support $format */
     public ?string $fallbackFormat = null;
 
-    /** @var ImageTransform[] */
-    public array $transforms = [];
+    // An aspect ratio from which to calculate transform heights
+    public ?float $aspectRatio = null;
+
+    /** @var ?Mode */
+    public ?string $mode = null;
+
+    /** @var ?Position */
+    public ?string $position = null;
+
+    /** @var ?Interlace */
+    public ?string $interlace = null;
+
+    /** Fill color */
+    public ?string $fill = null;
+
+    /** @var ?bool Allow upscaling */
+    public ?bool $upscale = null;
+
+    /** @var ?int<0, 100> Quality */
+    public ?int $quality = null;
+
+    /** @var ?class-string<ImageTransformerInterface> */
+    public ?string $transformer = null;
 
     /** @var int[] */
     public array $widths = [];
 
+    /** @var ImageTransform[] */
+    protected array $transforms = [];
+
     /** @var string[] */
-    public const ALLOWED_CASCADES = [
-        'mode',
+    protected const TRANSFORM_PROPERTIES = [
         'format',
-        'fallbackFormat',
+        'mode',
         'position',
-        'quality',
         'interlace',
+        'fill',
+        'upscale',
+        'quality',
         'transformer',
     ];
 
+    /**
+     * @param Format $format
+     * @param Format $fallbackFormat
+     * @param float $aspectRatio
+     * @param Mode $mode
+     * @param Position $position
+     * @param Interlace $interlace
+     * @param string $fill
+     * @param bool $upscale
+     * @param int<0, 100> $quality
+     * @param class-string<ImageTransformerInterface> $transformer
+     * @param int[] $widths
+     */
+    public function __construct(
+        ?string $format = null,
+        ?string $fallbackFormat = null,
+        ?float $aspectRatio = null,
+        ?string $mode = null,
+        ?string $position = null,
+        ?string $interlace = null,
+        ?string $fill = null,
+        ?bool $upscale = null,
+        ?int $quality = null,
+        ?string $transformer = null,
+        array $widths = [],
+    ) {
+        parent::__construct([
+            // 'baseTransform' => $baseTransform,
+            'format' => $format,
+            'fallbackFormat' => $fallbackFormat,
+            'aspectRatio' => $aspectRatio,
+            'mode' => $mode,
+            'position' => $position,
+            'interlace' => $interlace,
+            'fill' => $fill,
+            'upscale' => $upscale,
+            'quality' => $quality,
+            'transformer' => $transformer,
+            'widths' => $widths,
+        ]);
+    }
 
     /**
-     * @inheritDoc
-     *
-     * @param mixed ...$config
+     * @return ImageTransform[]
      */
-    public function __construct(...$config)
+    public function getTransforms(): array
     {
-        parent::__construct($config);
+        return $this->transforms;
     }
 
     /**
@@ -75,26 +145,13 @@ class TransformSet extends ImageTransform
      */
     public function fallback(): void
     {
-        if ($this->format === $this->fallbackFormat) {
+        $fallback = $this->fallbackFormat;
+        if (!$fallback || $this->format === $fallback) {
             return;
         }
         foreach ($this->transforms as &$transform) {
-            $transform->format = $this->fallbackFormat;
+            $transform->format = $fallback;
         }
-        $this->format = $this->fallbackFormat;
-    }
-
-    /**
-     * @inheritDoc
-     *
-     * @param mixed[] $parameters
-     */
-    public function extend(array $parameters): void
-    {
-        foreach ($parameters as $parameter => $value) {
-            if (in_array($parameter, static::ALLOWED_CASCADES, true) && !empty($value) && empty($this->$parameter)) {
-                $this->$parameter = $value;
-            }
-        }
+        $this->format = $fallback;
     }
 }

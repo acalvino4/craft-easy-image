@@ -46,13 +46,17 @@ class Picture extends Component
         // if string passed to $attributes, assume it is a class list
         $attributes = is_string($attributes) ? ['class' => $attributes] : $attributes;
 
-        $settings->normalize();
-
+        //
         foreach ($images as $image) {
-            if (!array_key_exists($image[1], $settings->transformSets)) {
-                throw new \OutOfBoundsException("Key '$image[1]' does not exist on the transformSets array in your Easy Image config.");
+            if (!$image[0]) {
+                throw new \ValueError('Asset cannot be null.');
             }
         }
+
+        $transformSetKeys = array_map(fn($image) => $image[1], $images);
+        $settings->prepare($transformSetKeys);
+
+
 
         return Craft::$app->view->renderTemplate('easy-image/picture', [
             'images' => $images,

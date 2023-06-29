@@ -1,47 +1,36 @@
 <?php
 
 use acalvino4\easyimage\models\Settings;
-use acalvino4\easyimage\models\Transform as T;
 use acalvino4\easyimage\models\TransformSet as TS;
 
 // In Craft 5, fluent config will be fully supported and `get_object_vars` will be unnecessary.
-// Any property not specified in a transform is inherited first from its parent TransformSet, then from the global config, then from defaults
+// Any property not specified in a transform set is inherited from the top level settings, then from craft defaults (if applicable)
 return get_object_vars(new Settings(
   transformSets: [
-    // In the simplest case, a transform set is just used to generate different resolutions of an image for different screen widths.
+    // A transform set is just used to generate different resolutions of an image for different screen widths / device densities; everything else stays the same between transforms in a set.
+    // This set corresponds to one <source> tag in the markup. Each width corresponds to one source in the "srcset" attribute.
     'hero' => new TS(
-      transforms: [
-        new T(width: 2560), // Usually you just need the width specified for a given transform.
-        new T(width: 1280),
-      ],
-      aspectRatio: 2 / 1, // Defining aspect ratio at the level of the transform set typically makes the most sense.
+      widths: [2560, 1280],
+      aspectRatio: 2 / 1,
     ),
-    'hero-mobile' => new TS( // sometimes you need to support different image proportions for certain screen sizes ("art direction")
-      transforms: [
-        new T(width: 640),
-        new T(width: 320),
-      ],
+    // When you need to support different image proportions for certain screen sizes ("art direction"), define another transform set.
+    'hero-mobile' => new TS(
+      widths: [640, 320],
       aspectRatio: 1 / 2,
     ),
     'complexExample' => new TS(
-      transforms: [
-        new T( // all normal transform settings (except 'format') can be applied here, as well as the additional 'aspectRatio'
-          width: 999,
-          aspectRatio: 3 / 2,
-          mode: 'fit',
-          quality: 95,
-        ),
-        new T(
-          height: 542,
-          width: 999,
-        ),
-      ],
-      // all normal transform settings, as well as 'aspectRatio' and 'fallbackFormat' can be applied here
+      widths: [256, 512, 1024, 2048], // The order doesn't matter, and there is no limit on number of transforms in a set.
+      // aspectRatio: 1 / 1, // With no aspect ratio set, height is set to AUTO, meaning the image keeps it's original proportions. You should set this if possible though, since some css layout solutions rely on this to avoid CLS.
+
+      // All normal transform settings, as well as 'aspectRatio' and 'fallbackFormat' can be applied here too.
       quality: 50,
-      format: 'webp', // normally this is a site-wide decision, but you can override it for a TranformSet if necessary
-      fallbackFormat: 'webp' // if 'format' is identical to 'fallbackFormat', the outputted markup will be simplified to include less sources
+      format: 'webp', // Normally this is a site-wide decision, but you can override it for a transform set if necessary (for example, if you're publishing a blog article comparing different image formats and hence need to display some in a non-optimized format).
+      fallbackFormat: 'webp', // if 'format' is identical to 'fallbackFormat', the outputted markup will be simplified to include less sources.
+      mode: 'fit',
     ),
   ],
+
+  // The rest of the settings cascade down to individual transform sets if not applied at that level
 
   // Changes the image format in generated markup.
   format: 'avif',
@@ -62,11 +51,6 @@ return get_object_vars(new Settings(
   // since it changes the default for all transforms, not just those set with this plugin
   quality: '90',
 
-  // Set the height and width for all transforms.
-  // A specific height and width makes aspectRatio irrelevant, so setting these will likely override any aspectRatio from having an effect, no matter how specific it is.
-  height: 0,
-  width: 0,
-
   // Set the global aspect ratio to use if height or width are ever not specified on a transform.
   // This overrides default image proportions, so you probably don't want it set at a global level.
   aspectRatio: 0,
@@ -77,8 +61,8 @@ return get_object_vars(new Settings(
 //
 // return [
 //     'transformSets' => [
-//         'hero' => [
+//         'hero' => new TS(
 //             //...
-//         ]
+//         ),
 //     ]
 // ];

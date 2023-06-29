@@ -36,8 +36,7 @@
         "class": "acalvino4\\easyimage\\Plugin"
     },
     "scripts": {
-        "codeception": "codecept run Unit",
-        "test": "ecs check --ansi && phpstan --memory-limit=1G",
+        "test": "ecs check --ansi && phpstan --memory-limit=1G && codecept run Unit",
         "fix": "ecs check --ansi --fix"
     },
     "config": {

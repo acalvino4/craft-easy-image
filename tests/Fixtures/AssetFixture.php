@@ -7,18 +7,15 @@ use Tests\Facades\Asset;
 
 class AssetFixture extends \craft\test\fixtures\elements\AssetFixture
 {
-    // /**
-    //  * Internal variable used to track id of current element
-    //  */
-    // private ?int $currentId;
-
     /**
      * @inheritDoc
+     * @var string
      */
     public $dataFile = __DIR__ . '/data/assets.php';
 
     /**
      * @inheritdoc
+     * @var class-string[]
      */
     public $depends = [FolderFixture::class];
 

@@ -11,6 +11,8 @@ class Asset extends BaseAsset
 {
     /**
      * @inheritDoc
+     *
+     * @param mixed $transform
      */
     public function getUrl(mixed $transform = null, ?bool $immediately = null): ?string
     {
