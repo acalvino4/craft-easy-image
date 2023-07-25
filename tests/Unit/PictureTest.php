@@ -122,7 +122,6 @@ class PictureTest extends Unit
             ['basic', ['example.jpg', 'hero-reordered'], 'mb-10 mx-auto lg:-mb-10'],
             // TransformSet-level overrides
             ['transform_set_overrides', ['example.jpg', 'overrides'], 'mb-10 mx-auto lg:-mb-10'],
-
         ];
     }
 }

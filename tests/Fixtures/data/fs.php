@@ -10,6 +10,6 @@ return [
         'type' => Local::class,
         'url' => App::env('PRIMARY_SITE_URL'),
         'hasUrls' => true,
-        'path' => dirname(__FILE__, 4) . '/testassets',
+        'path' => dirname(__FILE__, 4) . '/tempassets',
     ],
 ];

@@ -13,6 +13,7 @@ jobs:
       run: ddev composer install
     - name: Run tests
       run: |
+        mkdir tests/_craft/storage
         ddev composer exec codecept build
         ddev composer run test
 
