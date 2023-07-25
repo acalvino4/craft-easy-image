@@ -1,19 +1,23 @@
 {% macro srcset(image, transformSet) %}
-  srcset=
-    "{% for transform in transformSet.transforms %}
-      {% set mergedTransform = transformSet|merge(transform)|prepareTransform %}
-      {{ image[0].getUrl(mergedTransform) }} {{ mergedTransform.width }}w,
-    {% endfor %}"
+  srcset="
+    {% for transform in transformSet.transforms %}
+      {{ image[0].getUrl(transform) }} {{ transform.width }}w,
+    {% endfor %}
+  "
+  {# Set height and width based on the set's aspect ratio;
+     these numbers are just used to calculate aspect ratio to prevent CLS.
+     Defaults to 4/3 if no aspect ratio is set. #}
+  height="144"
+  width="{{ transformSet.aspectRatio ? (144 * transformSet.aspectRatio)|round : 192}}"
 {% endmacro %}
 
-{% set transformSets = settings.transformSets %}
 <picture>
   {# Output sources for main format #}
   {% for image in images %}
-    {% set transformSet = settings|merge(transformSets[image[1]]) %}
-    {% if transformSet.format is not same as(transformSet.fallbackFormat) %} {# if these are identical, the source will be covered in the next images loop #}
+    {% set transformSet = settings.transformSets[image[1]] %}
+    {% if transformSet.fallbackFormat is defined and transformSet.format is not same as(transformSet.fallbackFormat) %} {# if these are identical, the source will be covered in the next images loop #}
       <source
-        type="image/{{ transformSet.format }}"
+        type="image/{{ transformSet.format == 'jpg' ? 'jpeg' : transformSet.format }}"
         {{ _self.srcset(image, transformSet) }}
         {% if not loop.last %}
           media="(min-width: {{ image[2]|default(0) }}px)"
@@ -23,8 +27,8 @@
   {% endfor %}
   {# Output sources for fallback format #}
   {% for image in images %}
-    {% set transformSet = settings|merge(transformSets[image[1]]) %}
-    {% set transformSet = transformSet|merge({format: transformSet.fallbackFormat}) %}
+    {% set transformSet = settings.transformSets[image[1]] %}
+    {% do transformSet.fallback() %} {# updates format of this transform set to the fallback #}
     {% if not loop.last %}
       <source
         type="image/{{ transformSet.format }}"
@@ -35,7 +39,7 @@
       <img
         {{ attr(attributes) }}
         {# default to first transform for required src attr #}
-        src="{{ image[0].getUrl(transformSet|merge(transformSet.transforms[0])|prepareTransform) }}"
+        src="{{ image[0].getUrl(transformSet.transforms[0]) }}"
         {{ _self.srcset(image, transformSet) }}
         alt="{{ image[0].alt ?? image[0].title }}"
         {% if eager != true %}loading="lazy"{% endif %}

@@ -2,75 +2,80 @@
 
 namespace acalvino4\easyimage\models;
 
+use craft\models\ImageTransform;
+
 /**
  * Easy Image settings
- *
- * @phpstan-type FormatOption 'jpg'|'png'|'gif'|'webp'|'avif'
  */
 class Settings extends TransformSet
 {
-    /** @var array<TransformSet> */
+    /** @var TransformSet[] */
     public array $transformSets = [];
 
     /**
      * @inheritdoc
      *
+     * @param TransformSet[] $transformSets
      * @param mixed $config
      */
-    public function __construct(...$config)
+    public function __construct($transformSets = [], ...$config)
     {
-        if (array_key_exists('transforms', $config)) {
-            throw new \InvalidArgumentException("Cannot specify 'transforms' on Easy Image settings. Did you mean 'transformSet'?");
-        }
-
-        if (!array_key_exists('format', $config)) {
-            $config['format'] = 'avif';
-        }
-        if (!array_key_exists('falbackFormat', $config)) {
-            $config['fallbackFormat'] = 'webp';
-        }
+        $this->transformSets = $transformSets;
 
         parent::__construct(...$config);
     }
 
+    /**
+     * Creates transforms and cascades settings for use in twig template.
+     *
+     * @param string[] $transformSetKeys
+     */
+    public function prepare(array $transformSetKeys): void
+    {
+        if (!$this->format) {
+            $this->format = 'avif';
+        }
+        if (!$this->fallbackFormat) {
+            $this->fallbackFormat = 'webp';
+        }
 
+        // Get cascadable settings
+        $settingsArr = array_filter($this->toArray(array_merge(['aspectRatio', 'fallbackFormat'], static::TRANSFORM_PROPERTIES)));
+
+        foreach ($transformSetKeys as $key) {
+            $transformSet = $this->transformSets[$key];
+
+            // Cascade settings
+            foreach ($settingsArr as $parameter => $value) {
+                if (!$transformSet->$parameter) {
+                    $transformSet->$parameter = $value;
+                }
+            }
+
+            // Create transforms
+            arsort($transformSet->widths); // makes output predictable
+            foreach ($transformSet->widths as $width) {
+                if ($transformSet->aspectRatio) {
+                    $height = (int) round($width / $transformSet->aspectRatio);
+                }
+                $transformSet->transforms[] = new ImageTransform(array_merge(
+                    array_filter($transformSet->toArray(static::TRANSFORM_PROPERTIES)),
+                    [
+                        'width' => $width,
+                        'height' => $height ?? 0,
+                    ]
+                ));
+            }
+        }
+    }
 
     /**
-     * Image transforms are often used in sets via the picture tag for responsive image loading.
-     * This paramater takes an array where each element's key is the name of the transform set (e.g. 'hero', 'product-thumbnail')
-     * The value is a list of the Image Transforms to be generated for the set.
-     * Typically you'll only need to set width and height, but all settings (https://craftcms.com/docs/4.x/image-transforms.html#defining-transforms-from-the-control-panel) are supported, other than format, which is determined by top level settings.
-     *
-     * @param array<TransformSet> $transformSets The array of TransformSet.
+     * @param TransformSet[] $transformSets The array of TransformSet.
      * @return self
      */
     public function transformSets(array $transformSets): self
     {
         $this->transformSets = $transformSets;
-        return $this;
-    }
-
-    /**
-     * Sets the primary format to which images should be transformed. Defaults to avif.
-     *
-     * @param FormatOption $format
-     * @return self
-     */
-    public function format(string $format): self
-    {
-        $this->format = $format;
-        return $this;
-    }
-
-    /**
-     * Sets the fallback format to which images should be transformed. Defaults to avif.
-     *
-     * @param FormatOption $fallbackFormat
-     * @return self
-     */
-    public function fallbackFormat(string $fallbackFormat): self
-    {
-        $this->fallbackFormat = $fallbackFormat;
         return $this;
     }
 }

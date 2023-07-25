@@ -4,6 +4,8 @@ Maximally optimized images with minimal code.
 
 ## Intro
 
+The markup necessary for maximally optimized images is _complex_. But what if you could have it all, just by passing your asset, a transform set name, and whatever html attributes you want applied?
+
 Most image optimization plugins require too much configuration or don't use the latest best practices. If your transform service supports avif, you shouldn't need to specify that for every transform. Usually you want 'cover' mode. The main thing that changes between transform sets is the resize dimensions, so that's all we'll make you configure (everything else is optional but still possible).
 
 This plugin brings optimized (but configurable) transform defaults, and a twig function to output all the correct `picture` markup without you having to think about it.
@@ -12,45 +14,39 @@ We provide no-stress generation of markup that
 
 - defaults to next-gen image format (`avif`)
 - loads appropriate fallback format for older browsers (`webp` - yes, webp works even on "old" browser versions)
+- sets height and width to avoid CLS
 - loads scaled image based on viewport & resolution
 - handles art direction
 - handles lazy loading
 
-all while
+all with
 
-- requiring config only for things unique to your project
-- not requiring duplication of config in multiple places
-- allowing customizations to base plugin transform options (if you _really_ need `jpg`)
-- allowing overrides in particular cases
+- modern, sensible defaults
+- flexible, organized, and cascading configuration
 
 ## Usage
 
-In `config/easy-image.php` include something like the following:
+In `config/easy-image.php` include something like the following (see annotated `config.php` in plugin's `src` directory):
 
 ```php
 <?php
 
 use acalvino4\easyimage\models\Settings;
-use craft\models\ImageTransform;
+use craft\models\TransformSet;
 
-// In Craft 5, fluent config will be fully supported and `get_object_vars` will be unnecessary.
-return get_object_vars(Settings::create()
-  ->transformSets([
-      'hero' => [
-          new ImageTransform([
-              'width' => 2560,
-              'height' => 1280,
-          ]),
-          new ImageTransform([
-              'width' => 1280,
-              'height' => 640,
-              // all supported transform parameters can be listed here, but you usually won't need them
-          ]),
-          // more transforms for this set can be listed here
-      ],
-      // ... more transform sets, for example 'document-flow', 'product-thumbnail' can be listed here
-  ])
-);
+return get_object_vars(new Settings(
+  transformSets: [
+    'hero' => new TS(
+      widths: [2560, 1280],
+      aspectRatio: 2 / 1,
+    ),
+    'hero-mobile' => new TS(
+      widths: [640, 320],
+      aspectRatio: 1 / 2,
+    ),
+    // ...
+  ],
+));
 ```
 
 Then, wherever you need a hero image, just use this in your twig markup:
@@ -63,14 +59,27 @@ which will output something like
 
 ```html
 <picture>
-  <source type="image/avif" srcset="
-    [filesystem_url]/[asset_volume]/_2560x1280_crop_center-center_none/7/myImage.avif 640w,
-    [filesystem_url]/[asset_volume]/_1280x640_crop_center-center_none/7/myImage.avif 480w,
-  " media="(min-width: 0px)">
-  <img class="mx-auto mb-10 lg:-mb-10" src="[filesystem_url]/[asset_volume]/_640xAUTO_crop_center-center_none/7/myImage.webp" srcset="
-    [filesystem_url]/[asset_volume]/_2560x1280_crop_center-center_none/7/myImage.webp 640w,
-    [filesystem_url]/[asset_volume]/_1280x640_crop_center-center_none/7/myImage.webp 480w,
-  " alt="..." loading="lazy">
+  <source
+    type="image/avif"
+    srcset="
+      https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.avif 2560w,
+      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.avif 1280w,
+    "
+    height="144"
+    width="288"
+  />
+  <img
+    class="mb-10 mx-auto lg:-mb-10"
+    src="https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.webp"
+    srcset="
+      https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.webp 2560w,
+      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.webp 1280w,
+    "
+    height="144"
+    width="288"
+    alt="example"
+    loading="lazy"
+  />
 </picture>
 ```
 
@@ -79,12 +88,13 @@ A few things to note
 - Image format is  [`avif` (84% support)](https://caniuse.com/?search=avif), with fallback to [`webp` (98% support)](https://caniuse.com/?search=webp).
 - Lazy loading is assumed (but can be turned off via parameter explained below).
 - Class list is passed through to `img` element, which applies regardless of which source is used. (Other attributes can also be passed as explained below.)
+- The outputted height and width don't correspond to the instrinsic size, because when we are using a `srcset`, there is not just _one_ intrinsic size. However, the numbers _do_ correspond to the correct aspect ratio, which is the important thing for avoiding layout shifts (CLS).
 
 ## API
 
 ### Config
 
-Config is set through `config/easy-image.php`. Follow example above, or copy from `vendor/acalvino4/easy-image/src/config.php` to get started.
+Config is set through `config/easy-image.php`. Follow example above, or check out `vendor/acalvino4/easy-image/src/config.php` for a more thoroughly annotated example.
 
 ### Picture Twig Function
 
@@ -98,7 +108,7 @@ We'll show the function signature, give some explanation, then some examples.
  *
  * @phpstan-type ImageData array{Asset, string, 2?: int}
  * @param ImageData|ImageData[] $images
- * @param array<mixed>|string $attributes
+ * @param mixed[]|string $attributes
  * @param boolean $eager
  * @return string
  */
@@ -143,10 +153,29 @@ This example will load an alternate image on small screens, using the 'hero-mobi
 
 In both cases, the generated markup will contain the `data-something` attribute, and will _not_ lazy load.
 
+## Comparison to existing image optimization/transformation solutions
 
-## Comparison to existing image optimization plugins
+### Craft built-in transforms
 
-TODO
+Craft makes it extremely easy to define and reuse transforms, both from templates and the control panel. They even provide the [getSrcSet](https://docs.craftcms.com/api/v4/craft-elements-asset.html#method-getsrcset) function to generate the links for the `srcset` attribute. However, there are still several drawbacks.
+
+- You're on your own for handling multiple formats for browser compatibility
+- You're on your own for handling art direction scenarios
+- When defining transforms for a next-gen format and fallback transform within the same picture tag, most settings will be the same, so you have to repeat configuration
+- You can't define transforms using an aspect ratio
+- You have to manually handle height, width, and lazy loading
+
+### ImageOptimize
+
+nystudio107's image optimization plugin does a lot, including pregenerating transforms, generating placeholders, providing a control panel UI for defining transformsSets. Again though, there are some drawbacks and things it misses.
+
+- Doesn't support generating avif (better compression than webp, and no 'color banding')
+- You're on your own for generating complex `picture` markup mentioned before
+- Configuration must be repeated
+- On the subject of pregenerating transforms, this really is a tradeoff, not pure benefit, for a couple reasons:
+  - Content authors need to be concious of uploading images to the appropriate volume based on what transforms need to be done on the image, rather than organizing assets based on a logical content hierarchy. This breaks the abstration of content authors not needing to worry about implementation details.
+  - Some generated transforms might never be requested, wasting storage space and compute effort.
+  - The main benefit is to prevent needing to wait for an asset to generate to show it. But this only applies to the first request, so the negative impact, while unfortunate, is usually proportionally small.
 
 ## Requirements
 
@@ -177,19 +206,9 @@ composer require acalvino4/craft-easy-image
 
 ## TODO
 
-Implement:
-
 - Per-image transform overrides
-- Aspect Ratio transform setting
-
-Test:
-
-- Regular
-- Extra attributes
-- Eager loading
-- Art direction
-- Svg
-- Svgs
-- Svg and Image
-- Different default formats
-- Use of non-existant transformSet
+- Github qa workflow
+- Filepath for assets
+- Readme refresh
+- Comparison to other plugins
+- fix height when AR=auto

@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+## Description: Fix auto-fixable code
+## Usage: fix
+## Example: ddev fix
+
+ddev npm run fix
+ddev composer run-script fix

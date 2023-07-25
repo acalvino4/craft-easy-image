@@ -1,46 +1,53 @@
 {
-  "name": "acalvino4/craft-easy-image",
-  "description": "Maximally optimized images with minimal config",
-  "type": "craft-plugin",
-  "license": "mit",
-  "support": {
-    "issues": "https://github.com/acalvino4/craft-easy-image/issues?state=open",
-    "source": "https://github.com/acalvino4/craft-easy-image",
-    "docs": "https://github.com/acalvino4/craft-easy-image",
-    "rss": "https://github.com/acalvino4/craft-easy-image/releases.atom"
-  },
-  "require": {
-    "php": ">=8.0.2",
-    "craftcms/cms": "^4.4.0"
-  },
-  "require-dev": {
-    "craftcms/ecs": "dev-main",
-    "craftcms/phpstan": "dev-main"
-  },
-  "autoload": {
-    "psr-4": {
-      "acalvino4\\easyimage\\": "src/"
-    }
-  },
-  "extra": {
-    "handle": "easy-image",
-    "name": "Easy Image",
-    "developer": "acalvino4",
-    "documentationUrl": "https://github.com/acalvino4/craft-easy-image",
-    "class": "acalvino4\\easyimage\\Plugin"
-  },
-  "scripts": {
-    "test": "ecs check --ansi && phpstan --memory-limit=1G",
-    "fix": "ecs check --ansi --fix"
-  },
-  "config": {
-    "sort-packages": true,
-    "platform": {
-      "php": "8.0.2"
+    "name": "acalvino4/craft-easy-image",
+    "description": "Maximally optimized images with minimal config",
+    "type": "craft-plugin",
+    "license": "mit",
+    "support": {
+        "issues": "https://github.com/acalvino4/craft-easy-image/issues?state=open",
+        "source": "https://github.com/acalvino4/craft-easy-image",
+        "docs": "https://github.com/acalvino4/craft-easy-image",
+        "rss": "https://github.com/acalvino4/craft-easy-image/releases.atom"
     },
-    "allow-plugins": {
-      "yiisoft/yii2-composer": true,
-      "craftcms/plugin-installer": true
+    "require": {
+        "php": ">=8.1",
+        "craftcms/cms": "^4.4.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-asserts": "^3.0",
+        "codeception/module-phpbrowser": "^3.0",
+        "codeception/module-yii2": "^1.1",
+        "craftcms/ecs": "dev-main",
+        "craftcms/phpstan": "dev-main",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "acalvino4\\easyimage\\": "src/",
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "handle": "easy-image",
+        "name": "Easy Image",
+        "developer": "acalvino4",
+        "documentationUrl": "https://github.com/acalvino4/craft-easy-image",
+        "class": "acalvino4\\easyimage\\Plugin"
+    },
+    "scripts": {
+        "test": "ecs check --ansi && phpstan --memory-limit=1G && codecept run Unit",
+        "test-cov": "XDEBUG_MODE=coverage codecept run Unit --coverage --coverage-xml --coverage-html",
+        "fix": "ecs check --ansi --fix"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.1"
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
     }
-  }
 }

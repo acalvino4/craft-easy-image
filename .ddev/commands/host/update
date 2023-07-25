@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+## Description: Update all project dependencies
+## Usage: update
+## Example: ddev update
+
+ddev npm update
+ddev craft update all
+ddev composer update

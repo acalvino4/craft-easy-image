@@ -3,6 +3,7 @@
 namespace acalvino4\easyimage;
 
 use acalvino4\easyimage\models\Settings;
+use acalvino4\easyimage\services\Picture;
 use acalvino4\easyimage\web\twig\Extension;
 use Craft;
 use craft\base\Model;
@@ -16,6 +17,7 @@ use yii\base\Event;
  *
  * @method static Plugin getInstance()
  * @method Settings getSettings()
+ * @property-read Picture $picture
  * @author Augustine Calvino
  * @copyright Augustine Calvino
  * @license MIT
@@ -26,14 +28,17 @@ class Plugin extends BasePlugin
     public string $schemaVersion = '1.0.0';
     public bool $hasCpSettings = true;
 
-    // public static function config(): array
-    // {
-    //     return [
-    //         'components' => [
-    //             // Define component configs here...
-    //         ],
-    //     ];
-    // }
+    /**
+     * @return mixed[]
+     */
+    public static function config(): array
+    {
+        return [
+            'components' => [
+                'picture' => Picture::class,
+            ],
+        ];
+    }
 
     public function init(): void
     {
