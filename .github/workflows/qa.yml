@@ -12,7 +12,9 @@ jobs:
     - name: Install dependencies
       run: ddev composer install
     - name: Run tests
-      run: ddev composer run-script test
+      run: |
+        ddev composer exec codecept build
+        ddev composer run test
 
     # - name: Make code coverage badge
     #   uses: timkrase/phpunit-coverage-badge@v1.2.1
