@@ -5,4 +5,4 @@
 ## Example: ddev fix
 
 ddev npm run fix
-ddev composer run-script fix
+ddev composer run fix

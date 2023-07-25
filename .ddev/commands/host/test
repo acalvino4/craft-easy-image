@@ -5,4 +5,4 @@
 ## Example: ddev test
 
 ddev npm run test
-ddev composer run-script test
+ddev composer run test
