@@ -23,3 +23,7 @@ modules:
       cleanup: true
       transaction: true
       dbSetup: { clean: true, setupCraft: true }
+coverage:
+  enabled: true
+  include:
+    - src/*
