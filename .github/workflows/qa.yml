@@ -2,7 +2,7 @@ name: "Quality Assurance: codeception, phpstan, and ecs"
 on:
   push:
       branches:
-        - master
+        - tests
 jobs:
   test:
     runs-on: ubuntu-22.04
@@ -13,6 +13,7 @@ jobs:
       run: ddev composer install
     - name: Run tests
       run: |
+        mkdir _tests/_craft/storage
         ddev composer exec codecept build
         ddev composer run test
 
