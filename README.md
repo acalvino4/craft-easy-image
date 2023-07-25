@@ -2,6 +2,13 @@
 
 Maximally optimized images with minimal code.
 
+![License](https://img.shields.io/github/license/acalvino4/craft-easy-image)
+![Build Status](https://img.shields.io/github/actions/workflow/status/acalvino4/craft-easy-image/qa.yml)
+
+![Test Coverage](https://img.shields.io/badge/Tests-passing-brightgreen.svg)
+![Phpstan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)
+![Easy Coding Standard](https://img.shields.io/badge/Easy%20Coding%20Standard-%20enabled-brightgreen.svg)
+
 ## Intro
 
 The markup necessary for maximally optimized images is _complex_. But what if you could have it all, just by passing your asset, a transform set name, and whatever html attributes you want applied?

@@ -26,4 +26,4 @@ modules:
 coverage:
   enabled: true
   include:
-    - src/*
+    - src/**/*

@@ -2,7 +2,7 @@ name: "Quality Assurance: codeception, phpstan, and ecs"
 on:
   push:
       branches:
-        - tests
+        - master
 jobs:
   test:
     runs-on: ubuntu-22.04
