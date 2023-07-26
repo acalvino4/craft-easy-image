@@ -4,11 +4,10 @@
       {{ image[0].getUrl(transform) }} {{ transform.width }}w,
     {% endfor %}
   "
-  {# Set height and width based on the set's aspect ratio;
-     these numbers are just used to calculate aspect ratio to prevent CLS.
-     Defaults to 4/3 if no aspect ratio is set. #}
+  {# Set height and width based on the set's aspect ratio - these numbers are just used to calculate aspect ratio to prevent layout shift. #}
+  {% set aspectRatio = transformSet.aspectRatio ?? (image[0].width / image[0].height) %}
   height="144"
-  width="{{ transformSet.aspectRatio ? (144 * transformSet.aspectRatio)|round : 192}}"
+  width="{{ (144 * aspectRatio)|round }}"
 {% endmacro %}
 
 <picture>

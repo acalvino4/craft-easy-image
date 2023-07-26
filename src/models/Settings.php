@@ -40,14 +40,14 @@ class Settings extends TransformSet
         }
 
         // Get cascadable settings
-        $settingsArr = array_filter($this->toArray(array_merge(['aspectRatio', 'fallbackFormat'], static::TRANSFORM_PROPERTIES)));
+        $settingsArr = array_filter($this->toArray(array_merge(['aspectRatio', 'fallbackFormat'], static::TRANSFORM_PROPERTIES)), fn($a) => isset($a));
 
         foreach ($transformSetKeys as $key) {
             $transformSet = $this->transformSets[$key];
 
             // Cascade settings
             foreach ($settingsArr as $parameter => $value) {
-                if (!$transformSet->$parameter) {
+                if (!isset($transformSet->$parameter)) {
                     $transformSet->$parameter = $value;
                 }
             }
@@ -59,7 +59,7 @@ class Settings extends TransformSet
                     $height = (int) round($width / $transformSet->aspectRatio);
                 }
                 $transformSet->transforms[] = new ImageTransform(array_merge(
-                    array_filter($transformSet->toArray(static::TRANSFORM_PROPERTIES)),
+                    array_filter($transformSet->toArray(static::TRANSFORM_PROPERTIES), fn($a) => isset($a)),
                     [
                         'width' => $width,
                         'height' => $height ?? 0,
