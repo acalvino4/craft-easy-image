@@ -17,6 +17,9 @@ use craft\models\ImageTransform;
  */
 class TransformSet extends Model
 {
+    /** @var bool */
+    public bool $prepared = false;
+
     /** @var ?Format */
     public ?string $format = null;
 
@@ -152,6 +155,21 @@ class TransformSet extends Model
         foreach ($this->transforms as &$transform) {
             $transform->format = $fallback;
         }
-        $this->format = $fallback;
+    }
+
+    /**
+     * Resets the $format property of this object and all child transforms to $format
+     *
+     * @return void
+     */
+    public function reset(): void
+    {
+        $format = $this->format;
+        if ($this->fallbackFormat === $format) {
+            return;
+        }
+        foreach ($this->transforms as &$transform) {
+            $transform->format = $format;
+        }
     }
 }

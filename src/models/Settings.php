@@ -45,26 +45,31 @@ class Settings extends TransformSet
         foreach ($transformSetKeys as $key) {
             $transformSet = $this->transformSets[$key];
 
-            // Cascade settings
-            foreach ($settingsArr as $parameter => $value) {
-                if (!isset($transformSet->$parameter)) {
-                    $transformSet->$parameter = $value;
-                }
-            }
+            if (!$transformSet->prepared) {
 
-            // Create transforms
-            arsort($transformSet->widths); // makes output predictable
-            foreach ($transformSet->widths as $width) {
-                if ($transformSet->aspectRatio) {
-                    $height = (int) round($width / $transformSet->aspectRatio);
+                // Cascade settings
+                foreach ($settingsArr as $parameter => $value) {
+                    if (!isset($transformSet->$parameter)) {
+                        $transformSet->$parameter = $value;
+                    }
                 }
-                $transformSet->transforms[] = new ImageTransform(array_merge(
-                    array_filter($transformSet->toArray(static::TRANSFORM_PROPERTIES), fn($a) => isset($a)),
-                    [
-                        'width' => $width,
-                        'height' => $height ?? 0,
-                    ]
-                ));
+
+                // Create transforms
+                arsort($transformSet->widths); // makes output predictable
+                foreach ($transformSet->widths as $width) {
+                    if ($transformSet->aspectRatio) {
+                        $height = (int) round($width / $transformSet->aspectRatio);
+                    }
+                    $transformSet->transforms[] = new ImageTransform(array_merge(
+                        array_filter($transformSet->toArray(static::TRANSFORM_PROPERTIES), fn($a) => isset($a)),
+                        [
+                            'width' => $width,
+                            'height' => $height ?? 0,
+                        ]
+                    ));
+                }
+
+                $transformSet->prepared = true;
             }
         }
     }

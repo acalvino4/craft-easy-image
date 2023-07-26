@@ -30,7 +30,8 @@
     {% do transformSet.fallback() %} {# updates format of this transform set to the fallback #}
     {% if not loop.last %}
       <source
-        type="image/{{ transformSet.format }}"
+        {% set fallback = transformSet.fallbackFormat ?? transformSet.format %}
+        type="image/{{ fallback == 'jpg' ? 'jpeg' : fallback }}"
         {{ _self.srcset(image, transformSet) }}
         media="(min-width: {{ image[2]|default(0) }}px)"
       />
@@ -44,5 +45,6 @@
         {% if eager != true %}loading="lazy"{% endif %}
       />
     {% endif %}
+    {% do transformSet.reset() %} {# reverts format of this transform set to the standard #}
   {% endfor %}
 </picture>

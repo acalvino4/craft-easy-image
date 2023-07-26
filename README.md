@@ -92,7 +92,7 @@ which will output something like
 
 A few things to note
 
-- Image format is  [`avif` (84% support)](https://caniuse.com/?search=avif), with fallback to [`webp` (98% support)](https://caniuse.com/?search=webp).
+- Image format is [`avif` (84% support)](https://caniuse.com/?search=avif), with fallback to [`webp` (98% support)](https://caniuse.com/?search=webp).
 - Lazy loading is assumed (but can be turned off via parameter explained below).
 - Class list is passed through to `img` element, which applies regardless of which source is used. (Other attributes can also be passed as explained below.)
 - The outputted height and width don't correspond to the instrinsic size, because when we are using a `srcset`, there is not just _one_ intrinsic size. However, the numbers _do_ correspond to the correct aspect ratio, which is the important thing for avoiding layout shifts (CLS).
@@ -214,8 +214,7 @@ composer require acalvino4/craft-easy-image
 ## TODO
 
 - Per-image transform overrides
-- Github qa workflow
 - Filepath for assets
 - Readme refresh
 - Comparison to other plugins
-- multiple pictures in one page
+- handle sizes attribute
