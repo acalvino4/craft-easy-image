@@ -39,9 +39,7 @@ class Picture extends Component
         }
 
         // sort the array by min-width attribute (ImageData[2]) - this is essential bc browsers pick a source based on the first match
-        usort($images, function($a, $b) {
-            return ($b[2] ?? 0) - ($a[2] ?? 0);
-        });
+        usort($images, fn($a, $b) => ($b[2] ?? 0) - ($a[2] ?? 0));
 
         // if string passed to $attributes, assume it is a class list
         $attributes = is_string($attributes) ? ['class' => $attributes] : $attributes;
@@ -55,8 +53,6 @@ class Picture extends Component
 
         $transformSetKeys = array_map(fn($image) => $image[1], $images);
         $settings->prepare($transformSetKeys);
-
-
 
         return Craft::$app->view->renderTemplate('easy-image/picture', [
             'images' => $images,

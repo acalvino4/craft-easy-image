@@ -5,7 +5,7 @@ Maximally optimized images with minimal code.
 ![License](https://img.shields.io/github/license/acalvino4/craft-easy-image)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/acalvino4/craft-easy-image/qa.yml)
 
-![Test Coverage](https://img.shields.io/badge/Tests-passing-brightgreen.svg)
+![Test Coverage](https://img.shields.io/badge/Codeception-passing-brightgreen.svg)
 ![Phpstan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)
 ![Easy Coding Standard](https://img.shields.io/badge/Easy%20Coding%20Standard-%20enabled-brightgreen.svg)
 
@@ -39,7 +39,7 @@ In `config/easy-image.php` include something like the following (see annotated `
 <?php
 
 use acalvino4\easyimage\models\Settings;
-use craft\models\TransformSet;
+use craft\models\TransformSet as TS;
 
 return get_object_vars(new Settings(
   transformSets: [
@@ -218,4 +218,4 @@ composer require acalvino4/craft-easy-image
 - Filepath for assets
 - Readme refresh
 - Comparison to other plugins
-- fix height when AR=auto
+- multiple pictures in one page
