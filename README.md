@@ -70,7 +70,7 @@ which will output something like
     type="image/avif"
     srcset="
       https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.avif 2560w,
-      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.avif 1280w,
+      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.avif  1280w
     "
     height="144"
     width="288"
@@ -80,7 +80,7 @@ which will output something like
     src="https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.webp"
     srcset="
       https://easyimage.local/transforms/_2560x1280_crop_center-center_none/example.webp 2560w,
-      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.webp 1280w,
+      https://easyimage.local/transforms/_1280x640_crop_center-center_none/example.webp  1280w
     "
     height="144"
     width="288"
@@ -160,6 +160,26 @@ This example will load an alternate image on small screens, using the 'hero-mobi
 
 In both cases, the generated markup will contain the `data-something` attribute, and will _not_ lazy load.
 
+### Sizes
+
+If you use this plugin to generate your image markup as described above, you'll be doing great! But to really optimize, you should pass in the `sizes` attribute to the attribute list. By default, the browser will pick from your srcset based on which width descriptor matches your browser viewport width. This is necessary because while css styling may constrain the width of an image to, say, 50% of the page for a two column layout, or a flat 50px, the browser may need to request these images before the css is loaded. If your image is full-width, then you're all good, but many times an image only takes up a small fraction of the viewport - for example, a thumbnail image.
+
+The sizes attribute describes how wide your image will display directly in the html so the browser can request the appropriate image directly. It should often mirror your css styling, as in below examples, but keep in mind that parent containers may also constrain an image's width. Keep in mind that the browser will use the first media query matched, so list the more general cases last.
+
+#### Sizes Examples
+
+```twig
+  {{ picture([entry.testAsset.one(), 'hero'], {
+    class: "w-full sm:px-16 2xl:w-[640px]",
+    sizes: "(min-width: 1536px) 640px, (min-width: 640px) calc(100vw - 128px), 100vw",
+  } ) }}
+
+  {{ picture([entry.testAsset.one(), 'hero'], {
+    class: "w-full sm:w-[640px]",
+    sizes: "(min-width: 640px) 640px, 100vw",
+  } ) }}
+```
+
 ## Comparison to existing image optimization/transformation solutions
 
 ### Craft built-in transforms
@@ -217,4 +237,3 @@ composer require acalvino4/craft-easy-image
 - Filepath for assets
 - Readme refresh
 - Comparison to other plugins
-- handle sizes attribute

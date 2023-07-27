@@ -21,6 +21,7 @@
         {% if not loop.last %}
           media="(min-width: {{ image[2]|default(0) }}px)"
         {% endif %}
+        {% if attributes.sizes is defined %}sizes="{{ attributes.sizes }}"{% endif %}
       />
     {% endif %}
   {% endfor %}
@@ -34,6 +35,7 @@
         type="image/{{ fallback == 'jpg' ? 'jpeg' : fallback }}"
         {{ _self.srcset(image, transformSet) }}
         media="(min-width: {{ image[2]|default(0) }}px)"
+        {% if attributes.sizes is defined %}sizes="{{ attributes.sizes }}"{% endif %}
       />
     {% else %} {# Fallback img tag in place of final source #}
       <img

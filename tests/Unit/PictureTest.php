@@ -122,6 +122,11 @@ class PictureTest extends Unit
             ['basic', ['example.jpg', 'hero-reordered'], 'mb-10 mx-auto lg:-mb-10'],
             // TransformSet-level overrides
             ['transform_set_overrides', ['example.jpg', 'overrides'], 'mb-10 mx-auto lg:-mb-10'],
+            // Special handling of sizes attribute
+            ['sizes_attribute', ['example.jpg', 'hero'], [
+                'class' => 'w-full sm:w-[640px]',
+                'sizes' => '(min-width: 640px) 640px, 100vw',
+            ]],
         ];
     }
 }
