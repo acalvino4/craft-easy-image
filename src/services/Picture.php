@@ -26,8 +26,6 @@ class Picture extends Component
      */
     public function getPictureHtml(array $images, $attributes, $eager, Settings $settings): string
     {
-        // echo 'format: ' . $settings->transformSets['hero']->transforms[0]->format . ";\n";
-        // die;
         // if single image details passed, rather than array, make it an array of one
         /** @var ImageData[] */
         $images = is_array($images[0]) ? $images : [$images];
@@ -44,7 +42,6 @@ class Picture extends Component
         // if string passed to $attributes, assume it is a class list
         $attributes = is_string($attributes) ? ['class' => $attributes] : $attributes;
 
-        //
         foreach ($images as $image) {
             if (!$image[0]) {
                 throw new \ValueError('Asset cannot be null.');

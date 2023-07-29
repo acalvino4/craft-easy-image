@@ -11,7 +11,20 @@ Maximally optimized images with minimal code.
 
 ## Intro
 
-The markup necessary for maximally optimized images is _complex_. But what if you could have it all, just by passing your asset, a transform set name, and whatever html attributes you want applied?
+The markup necessary for maximally optimized images is _complex_. You have to know a lot to get it right, and even when you do, propogating and enforcing this knowledge across a team, not to mention implementing it without stray mistakes, is a challenge. Just some of the things you need to know are
+
+- How do I use height and width to avoid layout shift while still allowing resizing via css?
+- Does the order of sources in srcset matter?
+- Does the order of source tags in the picture element matter?
+- How do I configure sources for art direction?
+- Should I be using width descriptors or 'x' descriptors?
+- How do I specify fallback image formats?
+- How do I let the browser know how wide my image will display, before it or the css is loaded?
+- What is the mime type for jpg's?
+- Does the order of media queries in the sizes attribute matter?
+- Which attributes go on the img tag, which go on source tags, and which go on both?
+
+But what if you didn't have to think about all that, and instead had everything correct just by passing your asset, a transform set name, and whatever html attributes you want applied?
 
 Most image optimization plugins require too much configuration or don't use the latest best practices. If your transform service supports avif, you shouldn't need to specify that for every transform. Usually you want 'cover' mode. The main thing that changes between transform sets is the resize dimensions, so that's all we'll make you configure (everything else is optional but still possible).
 
@@ -51,7 +64,8 @@ return get_object_vars(new Settings(
       widths: [640, 320],
       aspectRatio: 1 / 2,
     ),
-    // ...
+    'thumbnail' => ...
+    'catalog-item' => ...
   ],
 ));
 ```
@@ -59,7 +73,7 @@ return get_object_vars(new Settings(
 Then, wherever you need a hero image, just use this in your twig markup:
 
 ```twig
-{{ picture([entry.myImageField.one(), 'hero'], "mx-auto mb-10 lg:mb-20") }}
+{{ picture([entry.myImageField.one(), 'hero'], "mx-auto my-10 lg:my-20") }}
 ```
 
 which will output something like
@@ -136,7 +150,7 @@ public function picture(array $images, $attributes = [], $eager = false): string
 The basic use case was demonstrated above:
 
 ```twig
-{{ picture([entry.myImageField.one(), 'hero'], 'mx-auto mb-10 lg:mb-20') }}
+{{ picture([entry.myImageField.one(), 'hero'], 'mx-auto my-10 lg:my-20') }}
 ```
 
 Notice that when the `$attributes` argument is a string, it is interpreted as a class list.
@@ -149,7 +163,7 @@ The most complex case would look something like this:
     [entry.myImageField.one(), 'hero', 768],
     [entry.myImageFieldAlt.one(), 'hero-mobile'],
   ], {
-    class: 'mx-auto mb-10 lg:mb-20',
+    class: 'mx-auto my-10 lg:my-20',
     data-something: 'custom stuff',
   }),
   true,
@@ -194,7 +208,7 @@ Craft makes it extremely easy to define and reuse transforms, both from template
 
 ### ImageOptimize
 
-nystudio107's image optimization plugin does a lot, including pregenerating transforms, generating placeholders, providing a control panel UI for defining transformsSets. Again though, there are some drawbacks and things it misses.
+nystudio107's image optimization plugin does a lot, including pregenerating transforms, generating placeholders, providing a control panel UI for defining transforms sets. Again though, there are some drawbacks and things it misses.
 
 - Doesn't support generating avif (better compression than webp, and no 'color banding')
 - You're on your own for generating complex `picture` markup mentioned before
@@ -237,3 +251,4 @@ composer require acalvino4/craft-easy-image
 - Filepath for assets
 - Readme refresh
 - Comparison to other plugins
+- Blurhash placeholder
