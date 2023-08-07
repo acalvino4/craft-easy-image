@@ -213,6 +213,10 @@ This will generally reduce the size to less than 500 bytes (around 250 in my tes
 
 The other thing to note is that this dependency is licensed as "treeware", meaning you are asked to [donate to plant trees](https://ecologi.com/treeware?gift-trees&ref=a77c966621c4104ab0ab03311413fa6e) when you use it in production. This can be a one-time donation, and there is no minumim.
 
+## Usage with and comparison to other image optimization / transform plugins
+
+[See accompanying doc.](docs/usage-comparison-other-plugins.md)
+
 ## Requirements
 
 This plugin requires Craft CMS 4.4.0 or later, and PHP 8.0.2 or later.
@@ -257,5 +261,4 @@ composer require acalvino4/craft-easy-image
 
 - Per-image transform overrides
 - Filepath or url for assets
-- Comparison to other plugins
 - Transform/optimize images on upload
