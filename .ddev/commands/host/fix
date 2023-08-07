@@ -4,5 +4,4 @@
 ## Usage: fix
 ## Example: ddev fix
 
-ddev npm run fix
 ddev composer run fix

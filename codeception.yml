@@ -20,6 +20,8 @@ modules:
       plugins:
         - class: '\acalvino4\easyimage\Plugin'
           handle: easy-image
+        - class: '\dodecastudio\blurhash\BlurHash'
+          handle: blur-hash
       cleanup: true
       transaction: true
       dbSetup: { clean: true, setupCraft: true }
