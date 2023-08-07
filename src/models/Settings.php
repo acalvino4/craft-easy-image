@@ -23,6 +23,21 @@ class Settings extends TransformSet
         $this->transformSets = $transformSets;
 
         parent::__construct(...$config);
+
+        // Using ImageOptimize's placeholder image; deprecated in favor of blurhash
+        // if (\Composer\InstalledVersions::isInstalled('nystudio107/craft-imageoptimize')) {
+        //     $volumeService = \Craft::$app->volumes;
+        //     $fieldMap = [];
+        //     foreach ($volumeService->getAllVolumes() as $volume) {
+        //         $fieldLayout = $volume->getFieldLayout();
+        //         $fields = $fieldLayout?->getCustomFields();
+        //         if ($fields) {
+        //             $optImgField = array_filter($fields, fn($a) => ($a instanceof OptimizedImages))[0] ?? null;
+        //             $fieldMap[$volume->handle] = $optImgField?->handle ?? '';
+        //         }
+        //     }
+        //     $this->imageOptimizeFields = $fieldMap;
+        // }
     }
 
     /**

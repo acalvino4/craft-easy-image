@@ -40,6 +40,7 @@
     {% else %} {# Fallback img tag in place of final source #}
       <img
         {{ attr(attributes) }}
+        style = "background: url({{ blurhash(image[0]) }}) center center / cover;"
         {# default to first transform for required src attr #}
         src="{{ image[0].getUrl(transformSet.transforms[0]) }}"
         {{ _self.srcset(image, transformSet) }}

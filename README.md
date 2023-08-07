@@ -23,8 +23,10 @@ The markup necessary for maximally optimized images is _complex_. You have to kn
 - What is the mime type for jpg's?
 - Does the order of media queries in the sizes attribute matter?
 - Which attributes go on the img tag, which go on source tags, and which go on both?
+- How do I generate and include blurry placeholders before images load?
+- How do I swap out the blurry placeholders for the real image (without js)?
 
-But what if you didn't have to think about all that, and instead had everything correct just by passing your asset, a transform set name, and whatever html attributes you want applied?
+But what if you didn't have to think about all that, and instead got correct markup just by specifying your asset, a transform set name, and whatever html attributes you want applied?
 
 Most image optimization plugins require too much configuration or don't use the latest best practices. If your transform service supports avif, you shouldn't need to specify that for every transform. Usually you want 'cover' mode. The main thing that changes between transform sets is the resize dimensions, so that's all we'll make you configure (everything else is optional but still possible).
 
@@ -38,6 +40,7 @@ We provide no-stress generation of markup that
 - loads scaled image based on viewport & resolution
 - handles art direction
 - handles lazy loading
+- generates, loads, and swaps a blurry placeholder image
 
 all with
 
@@ -194,33 +197,42 @@ The sizes attribute describes how wide your image will display directly in the h
   } ) }}
 ```
 
-## Comparison to existing image optimization/transformation solutions
+### Placeholder Images
 
-### Craft built-in transforms
+This plugin will inline a blurry version of your image until your image loads; there is nothing you need to do. It generates this image via the [Blur Hash](https://plugins.craftcms.com/blur-hash?craft4) plugin, which is automatically included. By default, that plugin will generate placeholders with a max size of 64px in the larger direction, which comes out to a few kb in size. Because this is rather larger to inline, I recommend overriding this by including the following in `config/blur-hash.php`:
 
-Craft makes it extremely easy to define and reuse transforms, both from templates and the control panel. They even provide the [getSrcSet](https://docs.craftcms.com/api/v4/craft-elements-asset.html#method-getsrcset) function to generate the links for the `srcset` attribute. However, there are still several drawbacks.
+```php
+<?php
 
-- You're on your own for handling multiple formats for browser compatibility
-- You're on your own for handling art direction scenarios
-- When defining transforms for a next-gen format and fallback transform within the same picture tag, most settings will be the same, so you have to repeat configuration
-- You can't define transforms using an aspect ratio
-- You have to manually handle height, width, and lazy loading
+return [
+    'blurredMaxImageSize' => 8,
+];
+```
 
-### ImageOptimize
+This will generally reduce the size to less than 500 bytes (around 250 in my tests), while retaining a decent amount of detail and avoiding pixelation. You can play around with this to find the right balance for you between data uri size and detail.
 
-nystudio107's image optimization plugin does a lot, including pregenerating transforms, generating placeholders, providing a control panel UI for defining transforms sets. Again though, there are some drawbacks and things it misses.
+The other thing to note is that this dependency is licensed as "treeware", meaning you are asked to [donate to plant trees](https://ecologi.com/treeware?gift-trees&ref=a77c966621c4104ab0ab03311413fa6e) when you use it in production. This can be a one-time donation, and there is no minumim.
 
-- Doesn't support generating avif (better compression than webp, and no 'color banding')
-- You're on your own for generating complex `picture` markup mentioned before
-- Configuration must be repeated
-- On the subject of pregenerating transforms, this really is a tradeoff, not pure benefit, for a couple reasons:
-  - Content authors need to be concious of uploading images to the appropriate volume based on what transforms need to be done on the image, rather than organizing assets based on a logical content hierarchy. This breaks the abstration of content authors not needing to worry about implementation details.
-  - Some generated transforms might never be requested, wasting storage space and compute effort.
-  - The main benefit is to prevent needing to wait for an asset to generate to show it. But this only applies to the first request, so the negative impact, while unfortunate, is usually proportionally small.
+## Usage with and comparison to other image optimization / transform plugins
+
+[See accompanying doc.](docs/usage-comparison-other-plugins.md)
 
 ## Requirements
 
 This plugin requires Craft CMS 4.4.0 or later, and PHP 8.0.2 or later.
+
+> **Warning**
+> If doing local transforms, ImageMagick 7 is required to avoid certain bugs (for example, converting a png with transparent background to avif results in a solid black background instead).
+
+Both ddev and the default ubuntu apt package will install ImageMagick 6 by default. I am not aware of a way to upgrade the version in ddev, but for ubuntu, just run the following script as root on your server.
+
+```bash
+t=$(mktemp) && wget 'https://dist.1-2.dev/imei.sh' -qO "$t" && bash "$t" && rm "$t"
+apt-get -qq install php-pear php-dev >/dev/null
+pecl install imagick -q >/dev/null </dev/null
+# insert your version of php below
+systemctl restart php<version>-fpm.service -q
+```
 
 ## Installation
 
@@ -245,10 +257,8 @@ composer require acalvino4/craft-easy-image
 ./craft plugin/install easy-image
 ```
 
-## TODO
+## Roadmap
 
 - Per-image transform overrides
-- Filepath for assets
-- Readme refresh
-- Comparison to other plugins
-- Blurhash placeholder
+- Filepath or url for assets
+- Transform/optimize images on upload

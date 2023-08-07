@@ -26,7 +26,6 @@ class Plugin extends BasePlugin
 {
     // public static Settings $settings;
     public string $schemaVersion = '1.0.0';
-    public bool $hasCpSettings = true;
 
     /**
      * @return mixed[]

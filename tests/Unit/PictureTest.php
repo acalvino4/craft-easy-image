@@ -49,6 +49,9 @@ class PictureTest extends Unit
     #[DataProvider('pictureData')]
     public function testGetPictureHtml(string $outputFile, array $images, mixed $attributes, bool $eager = false, array $settingsOverrides = [], ?string $error = null): void
     {
+        #Override blurhash function from plugin for testing
+        UnitHelper::overrideBlurhashFunction();
+
         # Fetch images from data string
         if (is_array($images[0])) {
             /** @var ImageData[] $images */
