@@ -55,7 +55,7 @@ In `config/easy-image.php` include something like the following (see annotated `
 <?php
 
 use acalvino4\easyimage\models\Settings;
-use craft\models\TransformSet as TS;
+use acalvino4\easyimage\models\TransformSet as TS;
 
 return get_object_vars(new Settings(
   transformSets: [

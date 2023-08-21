@@ -22,8 +22,8 @@ Easy Image uses the native transforms under the hood, but if using Easy Image yo
 
 nystudio107's image optimization plugin does a lot, including pregenerating transforms, generating placeholders, providing a control panel UI for defining transforms sets. Again though, there are some drawbacks and things it misses.
 
-- Doesn't support generating avif (better compression than webp, and no 'color banding')
-- You're on your own for generating complex `picture` markup mentioned before
+- Configuring variant creation of webp and avif requires setup and configuration beyond ImageMagick (and the avif setup is currently undocumented).
+- The function for generating complex `picture` markup is undocumented, and doesn't support art direction or avif variants.
 - Configuration must be repeated
 - On the subject of pregenerating transforms, this really is a tradeoff, not pure benefit, for a couple reasons:
   - Content authors need to be concious of uploading images to the appropriate volume based on what transforms need to be done on the image, rather than organizing assets based on a logical content hierarchy. This breaks the abstration of content authors not needing to worry about implementation details.
