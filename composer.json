@@ -11,8 +11,8 @@
     },
     "require": {
         "php": ">=8.1",
-        "craftcms/cms": "^4.4.0",
-        "dodecastudio/craft-blurhash": "^2.0"
+        "craftcms/cms": "^4.4.0|^5.0",
+        "dodecastudio/craft-blurhash": "^3.0"
     },
     "require-dev": {
         "codeception/codeception": "^5.0",
@@ -21,6 +21,7 @@
         "codeception/module-yii2": "^1.1",
         "craftcms/ecs": "dev-main",
         "craftcms/phpstan": "dev-main",
+        "craftcms/rector": "dev-main",
         "vlucas/phpdotenv": "^5.5"
     },
     "autoload": {
@@ -51,5 +52,7 @@
             "craftcms/plugin-installer": true,
             "treeware/plant": true
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
