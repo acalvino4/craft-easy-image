@@ -262,3 +262,4 @@ composer require acalvino4/craft-easy-image
 - Per-image transform overrides
 - Filepath or url for assets
 - Transform/optimize images on upload
+- Remove blurhash after image mounts - for when an image has transparent regions

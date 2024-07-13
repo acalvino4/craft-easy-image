@@ -27,6 +27,6 @@ class Asset extends BaseAsset
         } else {
             die;
         }
-        return $rootUrl . $basePath . '/' . $transformString . '/' . $filename;
+        return $rootUrl . $basePath . $transformString . '/' . $filename;
     }
 }

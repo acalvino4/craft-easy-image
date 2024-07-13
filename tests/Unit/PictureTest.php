@@ -130,6 +130,11 @@ class PictureTest extends Unit
                 'class' => 'w-full sm:w-[640px]',
                 'sizes' => '(min-width: 640px) 640px, 100vw',
             ]],
+            // Extra attributes include style
+            ['style_attribute', ['example.jpg', 'hero'], [
+                'class' => 'mb-10 mx-auto lg:-mb-10',
+                'style' => ' color: red;',
+            ]],
         ];
     }
 }
