@@ -1,5 +1,9 @@
 # Easy Image
 
+## [2.0.1] - 2024-07-20
+
+- Fixed regression that unscroupulously injected opinionated styles into templates
+
 ## [2.0.0] - 2024-07-13
 
 - Updated dependencies for Craft 5
@@ -21,6 +25,7 @@
 - Added placeholder support
 - Added tests
 
+[2.0.1]: (https://github.com/acalvino4/craft-easy-image/releases/tag/2.0.1)
 [2.0.0]: (https://github.com/acalvino4/craft-easy-image/releases/tag/2.0.0)
 [1.0.1]: (https://github.com/acalvino4/craft-easy-image/releases/tag/1.0.1)
 [1.0.0]: (https://github.com/acalvino4/craft-easy-image/releases/tag/1.0.0)

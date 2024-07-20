@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\events\RegisterTemplateRootsEvent;
-use craft\events\TemplateEvent;
 use craft\web\View;
 use yii\base\Event;
 
@@ -68,10 +67,6 @@ class Plugin extends BasePlugin
     {
         Event::on(View::class, View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
             $e->roots['easy-image'] = __DIR__ . '/templates';
-        });
-
-        Event::on(View::class, View::EVENT_BEFORE_RENDER_TEMPLATE, function(TemplateEvent $event) {
-            Craft::$app->getView()->registerCss("img, video {object-fit: cover;}");
         });
     }
 }
